@@ -1,29 +1,34 @@
-use std::iter::range_inclusive;
+use std::iter::{
+	OrdIterator,
+	range_inclusive,
+};
 use std::num::sqrt;
 
-fn least_divisor(n : uint) -> uint {
+fn least_divisor(n: uint) -> uint {
 	match range_inclusive(2, sqrt(n as f64) as uint).find(|&x| n % x == 0) {
 		Some(x) => x,
 		None => n,
 	}
 }
 
-fn prime_factorization(n : uint) -> ~[uint] {
-	let mut remainder = n;
-	let mut factors = ~[];
-	loop {
-		let divisor = least_divisor(remainder);
-		if divisor == remainder {
-			factors.push(remainder);
-			break;
+struct Factorization {
+	remainder: uint,
+}
+
+impl Iterator<uint> for Factorization {
+	fn next(&mut self) -> Option<uint> {
+		if self.remainder > 1 {
+			let factor = least_divisor(self.remainder);
+			self.remainder /= factor;
+			Some(factor)
 		} else {
-			remainder /= divisor;
-			factors.push(divisor);
+			None
 		}
 	}
-	factors
 }
 
 fn main() {
-	println!("{}", prime_factorization(600851475143).last().unwrap());
+	let mut fac = Factorization { remainder: 600851475143 };
+	let largest_factor = fac.max().unwrap();
+	println!("{}", largest_factor);
 }
