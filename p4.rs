@@ -10,7 +10,7 @@ impl Iterator<(uint, uint)> for CombinationRange {
 		let (first, second) = if self.second < self.stop {
 			(self.first, self.second)
 		} else {
-			(self.first + 1, self.start)
+			(self.first + 1, self.first + 1)
 		};
 
 		if first < self.stop && second < self.stop {
