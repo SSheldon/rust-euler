@@ -27,7 +27,8 @@ impl<A: Clone, T: Iterator<A> + Clone> Iterator<(A, A)> for Combination<A, T> {
 					self.inner.next()
 				}
 			};
-			match (self.outer_item.clone(), inner_item) {
+			let outer_item = self.outer_item.clone();
+			match (outer_item, inner_item) {
 				(Some(item1), Some(item2)) => Some((item1, item2)),
 				_ => None,
 			}
