@@ -1,30 +1,48 @@
-struct CombinationRange {
-	start: uint,
-	stop: uint,
-	first: uint,
-	second: uint,
+struct Combination<A, T> {
+	outer: T,
+	inner: T,
+	outer_item: Option<A>,
 }
 
-impl Iterator<(uint, uint)> for CombinationRange {
-	fn next(&mut self) -> Option<(uint, uint)> {
-		let (first, second) = if self.second < self.stop {
-			(self.first, self.second)
-		} else {
-			(self.first + 1, self.first + 1)
-		};
-
-		if first < self.stop && second < self.stop {
-			self.first = first;
-			self.second = second + 1;
-			Some((first, second))
-		} else {
-			None
+impl<A, T: Iterator<A> + Clone> Combination<A, T> {
+	fn new(mut itr: T) -> Combination<A, T> {
+		Combination{
+			inner: itr.clone(),
+			outer_item: itr.next(),
+			outer: itr,
 		}
 	}
 }
 
-fn combination_range(start: uint, stop: uint) -> CombinationRange {
-	CombinationRange { start: start, stop: stop, first: start, second: start}
+impl<A: Clone, T: Iterator<A> + Clone> Iterator<(A, A)> for Combination<A, T> {
+	fn next(&mut self) -> Option<(A, A)> {
+		if self.outer_item.is_none() {
+			None
+		} else {
+			let inner_item = match self.inner.next() {
+				Some(item) => Some(item),
+				None => {
+					self.inner = self.outer.clone();
+					self.outer_item = self.outer.next();
+					self.inner.next()
+				}
+			};
+			match (self.outer_item.clone(), inner_item) {
+				(Some(item1), Some(item2)) => Some((item1, item2)),
+				_ => None,
+			}
+		}
+	}
+}
+
+trait CombinableIterator<A> {
+	fn combination(self) -> Combination<A, Self>;
+}
+
+impl<A, T: Iterator<A> + Clone> CombinableIterator<A> for T {
+	fn combination(self) -> Combination<A, T> {
+		Combination::new(self)
+	}
 }
 
 struct Digits {
@@ -50,7 +68,7 @@ fn is_palindrome(n: uint) -> bool {
 }
 
 fn main() {
-	let combs = combination_range(100, 1000);
+	let combs = range(100u, 1000u).combination();
 	let max_palindrome = combs.map(|(x, y)| x * y)
 	                          .filter(|&x| is_palindrome(x))
 	                          .max().unwrap();
