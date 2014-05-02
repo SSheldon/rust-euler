@@ -1,7 +1,11 @@
-use std::iter::count;
+use std::iter::{
+	count,
+	range_inclusive,
+};
+use std::num::sqrt;
 
 fn is_prime(n: uint) -> bool {
-	range(2, n).all(|x| n % x != 0)
+	range_inclusive(2, sqrt(n as f64) as uint).all(|x| n % x != 0)
 }
 
 fn main() {
