@@ -1,4 +1,11 @@
-static GRID: [[uint, ..20], ..20] = [
+use std::cmp::max;
+use std::iter::{
+	MultiplicativeIterator,
+	range_inclusive,
+};
+
+static SIZE: uint = 20;
+static GRID: [[uint, ..SIZE], ..SIZE] = [
 	[08,02,22,97,38,15,00,40,00,75,04,05,07,78,52,12,50,77,91,08],
 	[49,49,99,40,17,81,18,57,60,87,17,40,98,43,69,48,04,56,62,00],
 	[81,49,31,73,55,79,14,29,93,71,40,67,53,88,30,03,49,13,36,65],
@@ -20,6 +27,28 @@ static GRID: [[uint, ..20], ..20] = [
 	[20,73,35,29,78,31,90,01,74,31,49,71,48,86,81,16,23,57,05,54],
 	[01,70,54,71,83,51,54,69,16,92,33,48,61,43,52,01,89,19,67,48],
 ];
+static LEN: uint = 4;
+
+fn max_product(x: uint, y: uint) -> uint {
+	let horiz = range(0, LEN).map(|i| GRID[x][y + i]).product();
+	let mut product = horiz;
+	if x + LEN <= SIZE {
+		let vert = range(0, LEN).map(|i| GRID[x + i][y]).product();
+		let diag = range(0, LEN).map(|i| GRID[x + i][y + i]).product();
+		product = max(product, max(vert, diag));
+	}
+	if x + 1 >= LEN {
+		let diag = range(0, LEN).map(|i| GRID[x - i][y + i]).product();
+		product = max(product, diag);
+	}
+	product
+}
+
+fn max_product_in_row(x: uint) -> uint {
+	range_inclusive(0, SIZE - LEN).map(|y| max_product(x, y)).max().unwrap()
+}
 
 fn main() {
+	let product = range(0, SIZE).map(max_product_in_row).max().unwrap();
+	println!("{}", product);
 }
