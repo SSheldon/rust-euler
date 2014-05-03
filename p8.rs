@@ -1,3 +1,5 @@
+use std::iter::MultiplicativeIterator;
+
 static DIGITS: [uint, ..1000] = [
 	7,3,1,6,7,1,7,6,5,3,1,3,3,0,6,2,4,9,1,9,2,2,5,1,1,
 	9,6,7,4,4,2,6,5,7,4,7,4,2,3,5,5,3,4,9,1,9,4,9,3,4,
@@ -41,5 +43,11 @@ static DIGITS: [uint, ..1000] = [
 	3,6,0,0,8,2,3,2,5,7,5,3,0,4,2,0,7,5,2,9,6,3,4,5,0,
 ];
 
+fn sequence_product(start: uint) -> uint {
+	DIGITS.slice(start, start + 5).iter().map(|&x| x).product()
+}
+
 fn main() {
+	let product = range(0u, 996u).map(sequence_product).max().unwrap();
+	println!("{}", product);
 }
