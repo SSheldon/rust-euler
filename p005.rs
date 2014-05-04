@@ -2,8 +2,8 @@ extern crate collections;
 
 use std::hash::Hash;
 use std::iter::{
-	count,
 	range_inclusive,
+	MultiplicativeIterator,
 };
 use std::num::sqrt;
 use collections::hashmap::HashMap;
@@ -31,6 +31,10 @@ impl Iterator<uint> for Factorization {
 	}
 }
 
+fn factorization(n: uint) -> Factorization {
+	Factorization{remainder: n}
+}
+
 fn freq_count<A: TotalEq + Hash, T: Iterator<A>>(mut itr: T) -> HashMap<A, uint> {
 	let mut map = HashMap::new();
 	for item in itr {
@@ -56,7 +60,16 @@ fn max_values<K: TotalEq + Hash + Clone, V: Ord + Clone, T: Iterator<HashMap<K, 
 	max
 }
 
+fn pow_with_uint(radix: uint, pow: uint) -> uint {
+	range(0, pow).fold(1, |n, _| n * radix)
+}
+
+fn lcm<T: Iterator<uint>>(itr: T) -> uint {
+	let factors = max_values(itr.map(|x| freq_count(factorization(x))));
+	factors.iter().map(|(&k, &v)| pow_with_uint(k, v)).product()
+}
+
 fn main() {
-	let min = count(1, 1).find(|&x| range(1, 21).all(|y| x % y == 0)).unwrap();
+	let min = lcm(range_inclusive(1u, 20u));
 	println!("{}", min);
 }
