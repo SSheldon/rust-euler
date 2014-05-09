@@ -1,7 +1,20 @@
+use std::cmp::max;
 use std::io::File;
 
 fn collapse_rows<T: Iterator<~[uint]>>(mut rows: T) -> uint {
-	0
+	let mut collapsed = match rows.next() {
+		Some(row) => row,
+		None => { return 0; }
+	};
+	for row in rows {
+		let prev = collapsed;
+		// Find the max of each pair in the row
+		let maxs = prev.iter().zip(prev.iter().skip(1)).map(|(&x, &y)| max(x, y));
+		// Add the new row to the max values from the previous row
+		collapsed = maxs.zip(row.iter()).map(|(x, &y)| x + y).collect();
+	}
+	// After the last row we've collapsed to a single element
+	collapsed[0]
 }
 
 fn nums_from_line(line: &str) -> ~[uint] {
