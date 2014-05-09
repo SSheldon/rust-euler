@@ -1,3 +1,70 @@
+struct VecMap<'a, K, V> {
+	index: 'a |&K| -> uint,
+	vec: Vec<Option<V>>,
+}
+
+impl<'a, K, V> Container for VecMap<'a, K, V> {
+	fn len(&self) -> uint {
+		self.vec.iter().count(|x| x.is_some())
+	}
+}
+
+impl<'a, K, V> Map<K, V> for VecMap<'a, K, V> {
+	fn find<'r>(&'r self, key: &K) -> Option<&'r V> {
+		let index = (self.index)(key);
+		if index < self.vec.len() {
+			self.vec.get(index).as_ref()
+		} else {
+			None
+		}
+	}
+}
+
+impl<'a, K, V> Mutable for VecMap<'a, K, V> {
+	fn clear(&mut self) {
+		self.vec.clear();
+	}
+}
+
+impl<'a, K, V> MutableMap<K, V> for VecMap<'a, K, V> {
+	fn swap(&mut self, key: K, val: V) -> Option<V> {
+		let index = (self.index)(&key);
+		let len = self.vec.len();
+		let old = if index < len {
+			self.vec.get_mut(index).take()
+		} else {
+			None
+		};
+		if index < len {
+			let new_len = index + 1;
+			self.vec.reserve(new_len);
+			for _ in range(len, new_len) {
+				self.vec.push(None);
+			}
+		}
+		*self.vec.get_mut(index) = Some(val);
+		old
+	}
+
+	fn pop(&mut self, key: &K) -> Option<V> {
+		let index = (self.index)(key);
+		if index < self.vec.len() {
+			self.vec.get_mut(index).take()
+		} else {
+			None
+		}
+	}
+
+	fn find_mut<'r>(&'r mut self, key: &K) -> Option<&'r mut V> {
+		let index = (self.index)(key);
+		if index < self.vec.len() {
+			self.vec.get_mut(index).as_mut()
+		} else {
+			None
+		}
+	}
+}
+
 struct Memoization<'a, A, B> {
 	cache: Vec<Option<B>>,
 	index: 'a |&A| -> uint,
