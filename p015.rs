@@ -66,29 +66,31 @@ impl<'a, K, V> MutableMap<K, V> for VecMap<'a, K, V> {
 	}
 }
 
-struct Memoization<'a, A, B> {
-	cache: Vec<Option<B>>,
-	index: 'a |&A| -> uint,
+struct Memoization<'a, A, B, T> {
 	calc: 'a |A, |A| -> B| -> B,
+	cache: T,
 }
 
-impl<'a, A, B: Clone> Memoization<'a, A, B> {
+impl<'a, A: Clone, B: Clone, T: MutableMap<A, B>> Memoization<'a, A, B, T> {
 	fn get(&mut self, arg: A) -> B {
-		let index = (self.index)(&arg);
-		if index >= self.cache.len() || self.cache.get(index).is_none() {
-			let result = (self.calc)(arg, |x| self.get(x));
-			self.cache.grow_set(index, &None, Some(result));
+		if self.cache.contains_key(&arg) {
+			let cached = self.cache.find(&arg).unwrap();
+			cached.clone()
+		} else {
+			let result = (self.calc)(arg.clone(), |x| self.get(x));
+			self.cache.insert(arg, result.clone());
+			result
 		}
-		let cached = self.cache.get(index);
-		cached.get_ref().clone()
 	}
 }
 
-fn memoize<'r, A, B>(index: 'r |&A| -> uint, calc: 'r |A, |A| -> B| -> B) -> Memoization<'r, A, B> {
+fn memoize<'r, A, B>(index: 'r |&A| -> uint, calc: 'r |A, |A| -> B| -> B) -> Memoization<'r, A, B, VecMap<'r, A, B>> {
 	Memoization{
-		cache: Vec::new(),
-		index: index,
 		calc: calc,
+		cache: VecMap{
+			index: index,
+			vec: Vec::new(),
+		},
 	}
 }
 
