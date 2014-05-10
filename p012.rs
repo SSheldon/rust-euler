@@ -1,18 +1,56 @@
-use std::iter::range_inclusive;
-use std::num::sqrt;
+extern crate collections;
 
-fn is_triangular(n: uint) -> bool {
-	// If n is triangular, there must be some i such that i(i+1)/2=n
-	// So by the quadratic formula, (sqrt(1+8n)-1)/2 must be an integer
-	let d = 8 * n + 1;
-	let sqrt_d = sqrt(d as f64) as uint;
-	(sqrt_d * sqrt_d == d) && ((sqrt_d - 1) % 2 == 0)
+use std::hash::Hash;
+use std::iter::{
+	count,
+	MultiplicativeIterator,
+	range_inclusive,
+};
+use std::num::sqrt;
+use collections::hashmap::HashMap;
+
+fn least_divisor(n: uint) -> uint {
+	match range_inclusive(2, sqrt(n as f64) as uint).find(|&x| n % x == 0) {
+		Some(x) => x,
+		None => n,
+	}
+}
+
+struct Factorization {
+	remainder: uint,
+}
+
+impl Iterator<uint> for Factorization {
+	fn next(&mut self) -> Option<uint> {
+		if self.remainder > 1 {
+			let factor = least_divisor(self.remainder);
+			self.remainder /= factor;
+			Some(factor)
+		} else {
+			None
+		}
+	}
+}
+
+fn factorization(n: uint) -> Factorization {
+	Factorization{remainder: n}
+}
+
+fn freq_count<A: TotalEq + Hash, T: Iterator<A>>(mut itr: T) -> HashMap<A, uint> {
+	let mut map = HashMap::new();
+	for item in itr {
+		map.insert_or_update_with(item, 1, |_, count| *count += 1);
+	}
+	map
 }
 
 fn num_factors(n: uint) -> uint {
-	// Only factor after n/2 is n, so just stop halfway and add 1
-	1 + range_inclusive(1, n / 2).count(|x| n % x == 0)
+	let factor_count = freq_count(factorization(n));
+	factor_count.values().map(|&x| x + 1).product()
 }
 
 fn main() {
+	let mut triangle_numbers = count(1u, 1).map(|x| (x * (x + 1)) / 2);
+	let num = triangle_numbers.find(|&x| num_factors(x) > 500).unwrap();
+	println!("{}", num);
 }
