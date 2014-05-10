@@ -35,7 +35,8 @@ impl<'a, K, V> MutableMap<K, V> for VecMap<'a, K, V> {
 		} else {
 			None
 		};
-		if index < len {
+		// It'd be nice to use grow_set here, but it requires V: Clone
+		if index >= len {
 			let new_len = index + 1;
 			self.vec.reserve(new_len);
 			for _ in range(len, new_len) {
