@@ -1,6 +1,9 @@
 extern crate collections;
 
-use std::iter::range_inclusive;
+use std::iter::{
+	AdditiveIterator,
+	range_inclusive,
+};
 use std::num::sqrt;
 use collections::hashmap::HashSet;
 
@@ -41,6 +44,18 @@ fn divisors(n: uint) -> HashSet<uint> {
 	divisors
 }
 
+fn proper_divisors(n: uint) -> HashSet<uint> {
+	let mut proper_divisors = divisors(n);
+	proper_divisors.remove(&n);
+	proper_divisors
+}
+
+fn is_amicable(n: uint) -> bool {
+	let other = proper_divisors(n).move_iter().sum();
+	other != n && n == proper_divisors(other).move_iter().sum()
+}
+
 fn main() {
-	println!("{}", divisors(220));
+	let amicable_sum = range(2u, 10000u).filter(|&x| is_amicable(x)).sum();
+	println!("{}", amicable_sum);
 }
