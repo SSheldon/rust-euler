@@ -1,34 +1,9 @@
-use std::iter::{
-	OrdIterator,
-	range_inclusive,
-};
-use std::num::sqrt;
+use std::iter::OrdIterator;
+use euler::factorization;
 
-fn least_divisor(n: uint) -> uint {
-	match range_inclusive(2, sqrt(n as f64) as uint).find(|&x| n % x == 0) {
-		Some(x) => x,
-		None => n,
-	}
-}
-
-struct Factorization {
-	remainder: uint,
-}
-
-impl Iterator<uint> for Factorization {
-	fn next(&mut self) -> Option<uint> {
-		if self.remainder > 1 {
-			let factor = least_divisor(self.remainder);
-			self.remainder /= factor;
-			Some(factor)
-		} else {
-			None
-		}
-	}
-}
+mod euler;
 
 fn main() {
-	let mut fac = Factorization { remainder: 600851475143 };
-	let largest_factor = fac.max().unwrap();
+	let largest_factor = factorization(600851475143).max().unwrap();
 	println!("{}", largest_factor);
 }

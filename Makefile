@@ -4,13 +4,13 @@ PROBLEMS := $(patsubst %.rs,%,$(wildcard p*.rs))
 
 all: $(PROBLEMS)
 
-p%: p%.rs
-	rustc -O $^
+p%: p%.rs euler/mod.rs
+	rustc -O $<
 
 time-all: $(addprefix time-,$(PROBLEMS))
 
 time-p%: p%
-	@time ./$^
+	@time ./$<
 
 clean-all:
 	rm -f $(PROBLEMS)
