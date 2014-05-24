@@ -5,6 +5,7 @@ use std::iter::{
 	range_inclusive,
 	MultiplicativeIterator,
 };
+use std::num::pow;
 use collections::hashmap::HashMap;
 use euler::factorization;
 
@@ -35,13 +36,9 @@ fn max_values<K: TotalEq + Hash + Clone, V: Ord + Clone, T: Iterator<HashMap<K, 
 	max
 }
 
-fn pow_with_uint(radix: uint, pow: uint) -> uint {
-	range(0, pow).fold(1, |n, _| n * radix)
-}
-
 fn lcm<T: Iterator<uint>>(itr: T) -> uint {
 	let factors = max_values(itr.map(|x| freq_count(factorization(x))));
-	factors.iter().map(|(&k, &v)| pow_with_uint(k, v)).product()
+	factors.iter().map(|(&k, &v)| pow(k, v)).product()
 }
 
 fn main() {
