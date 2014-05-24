@@ -1,9 +1,7 @@
-use std::iter::{count, range_inclusive};
-use std::num::sqrt;
+use std::iter::count;
+use euler::is_prime;
 
-fn is_prime(n: uint) -> bool {
-	range_inclusive(2, sqrt(n as f64) as uint).all(|x| n % x != 0)
-}
+mod euler;
 
 fn num_primes(a: int, b: int) -> uint {
 	count(1, 1).map(|n| n * n + a * n + b)

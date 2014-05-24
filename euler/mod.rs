@@ -1,3 +1,5 @@
+#![allow(dead_code)]
+
 use std::iter::range_inclusive;
 use std::num::sqrt;
 
@@ -26,4 +28,8 @@ impl Iterator<uint> for Factorization {
 
 pub fn factorization(n: uint) -> Factorization {
 	Factorization{remainder: n}
+}
+
+pub fn is_prime(n: uint) -> bool {
+	range_inclusive(2, sqrt(n as f64) as uint).all(|x| n % x != 0)
 }
