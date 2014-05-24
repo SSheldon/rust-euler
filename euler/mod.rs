@@ -1,6 +1,6 @@
 #![allow(dead_code)]
 
-use std::iter::range_inclusive;
+use std::iter::{AdditiveIterator, range_inclusive};
 use std::num::{Num, One, sqrt, Zero};
 
 // Factorization
@@ -55,5 +55,31 @@ impl<T: Num + Clone> Iterator<T> for Fibonacci<T> {
 		self.previous = curr;
 		self.current = next.clone();
 		Some(next)
+	}
+}
+
+// Digits
+pub struct Digits<T> {
+	priv remainder: T,
+	priv radix: T,
+}
+
+impl<T: Num> Digits<T> {
+	pub fn new(n: T) -> Digits<T> {
+		let one: |int| -> T = |_| { One::one() };
+		let ten: T = range(0, 10).map(one).sum(); // Lol
+		Digits{remainder: n, radix: ten}
+	}
+}
+
+impl<T: Num> Iterator<T> for Digits<T> {
+	fn next(&mut self) -> Option<T> {
+		if !self.remainder.is_zero() {
+			let digit = self.remainder % self.radix;
+			self.remainder = self.remainder / self.radix;
+			Some(digit)
+		} else {
+			None
+		}
 	}
 }
