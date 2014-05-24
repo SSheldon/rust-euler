@@ -1,7 +1,7 @@
 use std::cmp::max;
 use std::io::File;
 
-fn collapse_rows<T: Iterator<~[uint]>>(mut rows: T) -> uint {
+fn collapse_rows<T: Iterator<Vec<uint>>>(mut rows: T) -> uint {
 	let mut collapsed = match rows.next() {
 		Some(row) => row,
 		None => { return 0; }
@@ -14,10 +14,10 @@ fn collapse_rows<T: Iterator<~[uint]>>(mut rows: T) -> uint {
 		collapsed = maxs.zip(row.iter()).map(|(x, &y)| x + y).collect();
 	}
 	// After the last row we've collapsed to a single element
-	collapsed[0]
+	*collapsed.get(0)
 }
 
-fn nums_from_line(line: &str) -> ~[uint] {
+fn nums_from_line(line: &str) -> Vec<uint> {
 	line.split(' ').map(|x| from_str(x).unwrap()).collect()
 }
 
