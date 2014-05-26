@@ -19,5 +19,17 @@ fn unit_frac_decimals(divisor: uint) -> Decimals {
 	Decimals{remainder: 10, divisor: divisor}
 }
 
+fn recurring_cycle<A, T: Iterator<A>>(itr: T) -> Option<Vec<A>> {
+	None
+}
+
 fn main() {
+	let max_d = range(2u, 1000u).max_by(|&d| {
+		let decimals = unit_frac_decimals(d);
+		match recurring_cycle(decimals) {
+			Some(cycle) => cycle.len(),
+			None => 0,
+		}
+	}).unwrap();
+	println!("{}", max_d);
 }
