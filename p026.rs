@@ -1,62 +1,19 @@
-use std::iter::CloneableIterator;
-
-#[deriving(Clone)]
-struct Decimals {
-	remainder: uint,
-	divisor: uint,
-}
-
-impl Iterator<uint> for Decimals {
-	fn next(&mut self) -> Option<uint> {
-		if self.remainder > 0 {
-			let digit = self.remainder / self.divisor;
-			self.remainder = (self.remainder % self.divisor) * 10;
-			Some(digit)
-		} else {
-			None
+fn recurring_cycle_len(d: uint) -> uint {
+	let mut rem = 1;
+	let mut prev_rems = Vec::new();
+	while rem > 0 {
+		// If we have a remainder we've already seen, it's a cycle
+		match prev_rems.iter().position(|&x| rem == x) {
+			Some(x) => { return prev_rems.len() - x; }
+			None => (),
 		}
+		prev_rems.push(rem);
+		rem = (rem * 10) % d;
 	}
-}
-
-fn unit_frac_decimals(divisor: uint) -> Decimals {
-	Decimals{remainder: 10, divisor: divisor}
-}
-
-fn is_recurring_cycle<A: Eq, T: Iterator<A>>(mut itr: T, cycle: &[A]) -> bool {
-	let cycle_itr = cycle.iter().cycle();
-	// Can't check infinitely, but check it cycles 3 times
-	for x in cycle_itr.take(cycle.len() * 3) {
-		match itr.next() {
-			None => { return false; }
-			Some(ref y) if x != y => { return false; }
-			Some(_) => { continue; }
-		}
-	}
-	true
-}
-
-fn recurring_cycle<A: Eq, T: Clone + Iterator<A>>(mut itr: T) -> Option<Vec<A>> {
-	loop {
-		let mut cycle = Vec::new();
-		// A cycle might not start here, so stop after we've checked 1000
-		for item in itr.clone().take(1000) {
-			cycle.push(item);
-			if is_recurring_cycle(itr.clone(), cycle.as_slice()) {
-				return Some(cycle)
-			}
-		}
-		if itr.next().is_none() { break; }
-	}
-	None
+	0
 }
 
 fn main() {
-	let max_d = range(2u, 1000u).max_by(|&d| {
-		let decimals = unit_frac_decimals(d);
-		match recurring_cycle(decimals) {
-			Some(cycle) => cycle.len(),
-			None => 0,
-		}
-	}).unwrap();
+	let max_d = range(2u, 1000u).max_by(|&d| recurring_cycle_len(d)).unwrap();
 	println!("{}", max_d);
 }
