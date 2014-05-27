@@ -1,5 +1,6 @@
 use std::iter::CloneableIterator;
 
+#[deriving(Clone)]
 struct Decimals {
 	remainder: uint,
 	divisor: uint,
@@ -34,7 +35,18 @@ fn is_recurring_cycle<A: Eq, T: Iterator<A>>(mut itr: T, cycle: &[A]) -> bool {
 	true
 }
 
-fn recurring_cycle<A, T: Iterator<A>>(itr: T) -> Option<Vec<A>> {
+fn recurring_cycle<A: Eq, T: Clone + Iterator<A>>(mut itr: T) -> Option<Vec<A>> {
+	loop {
+		let mut cycle = Vec::new();
+		// A cycle might not start here, so stop after we've checked 1000
+		for item in itr.clone().take(1000) {
+			cycle.push(item);
+			if is_recurring_cycle(itr.clone(), cycle.as_slice()) {
+				return Some(cycle)
+			}
+		}
+		if itr.next().is_none() { break; }
+	}
 	None
 }
 
