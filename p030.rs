@@ -21,4 +21,7 @@ fn digit_power_sum(n: uint) -> uint {
 }
 
 fn main() {
+	// Upper bound chosen empirically
+	let sum = range(2u, 200000u).filter(|&x| x == digit_power_sum(x)).sum();
+	println!("{}", sum);
 }
