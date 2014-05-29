@@ -1,6 +1,7 @@
 extern crate num;
 
-use num::Integer;
+use std::iter::{MultiplicativeIterator, Repeat};
+use num::rational::Ratio;
 
 fn digits_cancel(numer: uint, denom: uint) -> bool {
 	let (n1, n0) = (numer / 10, numer % 10);
@@ -12,16 +13,10 @@ fn digits_cancel(numer: uint, denom: uint) -> bool {
 }
 
 fn main() {
-	let mut numer = 1;
-	let mut denom = 1;
-	for n in range(10u, 100u) {
-		for d in range(n + 1, 100u) {
-			if digits_cancel(n, d) {
-				numer *= n;
-				denom *= d;
-			}
-		}
-	}
-	let gcd = numer.gcd(&denom);
-	println!("{}", denom / gcd);
+	let product = range(10u, 100u)
+		.flat_map(|n| Repeat::new(n).zip(range(n + 1, 100u)))
+		.filter(|&(n, d)| digits_cancel(n, d))
+		.map(|(n, d)| Ratio::new(n, d))
+		.product().reduced();
+	println!("{}", product.denom());
 }
