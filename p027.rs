@@ -1,4 +1,4 @@
-use std::iter::count;
+use std::iter::{count, Repeat};
 use euler::is_prime;
 
 mod euler;
@@ -10,7 +10,9 @@ fn num_primes(a: int, b: int) -> uint {
 }
 
 fn main() {
-	let mut pairs = range(0, 1999 * 1999).map(|x| (x / 1999 - 999, x % 1999 - 999));
-	let (a, b) = pairs.max_by(|&(a, b)| num_primes(a, b)).unwrap();
+	let (a, b) = range(-999, 1000)
+		.flat_map(|a| Repeat::new(a).zip(range(-999, 1000)))
+		.max_by(|&(a, b)| num_primes(a, b))
+		.unwrap();
 	println!("{}", a * b);
 }
