@@ -1,4 +1,7 @@
 use std::num::{log10, pow};
+use euler::is_prime;
+
+mod euler;
 
 struct Rotations {
 	rotation: uint,
@@ -28,4 +31,6 @@ impl Iterator<uint> for Rotations {
 }
 
 fn main() {
+	let count = range(2u, 1000000u).count(|x| Rotations::new(x).all(is_prime));
+	println!("{}", count);
 }
