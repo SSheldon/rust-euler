@@ -1,5 +1,5 @@
 use std::num::{log10, pow};
-use euler::is_prime;
+use euler::primes;
 
 mod euler;
 
@@ -31,6 +31,8 @@ impl Iterator<uint> for Rotations {
 }
 
 fn main() {
-	let count = range(2u, 1000000u).count(|x| Rotations::new(x).all(is_prime));
+	let prime_set = primes(1000000);
+	let count = prime_set.iter()
+		.count(|x| Rotations::new(x).all(|y| prime_set.contains(&y)));
 	println!("{}", count);
 }

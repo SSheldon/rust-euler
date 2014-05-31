@@ -5,7 +5,7 @@ extern crate num;
 
 use std::iter::{AdditiveIterator, range_inclusive, range_step};
 use std::num::{Num, One, sqrt, Zero};
-use self::collections::bitv::Bitv;
+use self::collections::bitv::{Bitv, BitvSet};
 use self::num::Integer;
 
 // Factorization
@@ -70,6 +70,12 @@ impl Iterator<uint> for Primes {
 			}
 		}
 	}
+}
+
+pub fn primes(stop: uint) -> BitvSet {
+	let mut itr = Primes::new(stop);
+	itr.advance(|_| true);
+	BitvSet::from_bitv(itr.primes)
 }
 
 // Fibonacci
