@@ -1,5 +1,3 @@
-#![allow(dead_code)]
-
 extern crate num;
 
 use std::collections::bitv::Bitv;

@@ -1,7 +1,7 @@
+extern crate euler;
+
 use std::iter::{count, Repeat};
 use euler::is_prime;
-
-mod euler;
 
 fn num_primes(a: int, b: int) -> uint {
 	count(1, 1).map(|n| n * n + a * n + b)

@@ -1,3 +1,4 @@
+extern crate euler;
 extern crate num;
 
 use std::iter::{
@@ -7,8 +8,6 @@ use std::iter::{
 };
 use num::bigint::ToBigUint;
 use euler::Digits;
-
-mod euler;
 
 fn main() {
 	let pow = Repeat::new(2u.to_biguint().unwrap()).take(1000).product();

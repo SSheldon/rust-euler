@@ -1,7 +1,7 @@
+extern crate euler;
+
 use std::iter::AdditiveIterator;
 use euler::Fibonacci;
-
-mod euler;
 
 fn main() {
 	let fib = Fibonacci::<uint>::new();

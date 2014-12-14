@@ -1,10 +1,9 @@
 extern crate collections;
+extern crate euler;
 
 use std::iter::AdditiveIterator;
 use collections::hashmap::HashSet;
 use euler::factorization;
-
-mod euler;
 
 fn divisors(n: uint) -> HashSet<uint> {
 	let mut divisors = HashSet::new();

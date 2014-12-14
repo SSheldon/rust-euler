@@ -1,7 +1,7 @@
+extern crate euler;
+
 use std::iter::AdditiveIterator;
 use euler::Digits;
-
-mod euler;
 
 static DIGIT_POWS: [uint, ..10] = [
 	0,

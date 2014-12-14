@@ -1,7 +1,7 @@
+extern crate euler;
+
 use std::num::{log10, pow};
 use euler::primes;
-
-mod euler;
 
 struct Rotations {
 	rotation: uint,

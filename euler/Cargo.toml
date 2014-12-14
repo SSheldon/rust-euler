@@ -5,7 +5,7 @@ authors = ["Steven Sheldon"]
 
 [lib]
 name = "euler"
-path = "mod.rs"
+path = "lib.rs"
 
 [dependencies]
 num = "0.0.6"

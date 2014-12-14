@@ -1,10 +1,9 @@
+extern crate euler;
 extern crate num;
 
 use std::num::pow;
 use num::bigint::{BigUint, ToBigUint};
 use euler::Fibonacci;
-
-mod euler;
 
 fn main() {
 	let mut fib = Fibonacci::<BigUint>::new();

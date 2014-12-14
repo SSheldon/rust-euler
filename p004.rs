@@ -1,6 +1,6 @@
-use euler::Digits;
+extern crate euler;
 
-mod euler;
+use euler::Digits;
 
 struct Combination<A, T> {
 	outer: T,

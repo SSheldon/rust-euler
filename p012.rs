@@ -1,4 +1,5 @@
 extern crate collections;
+extern crate euler;
 
 use std::hash::Hash;
 use std::iter::{
@@ -7,8 +8,6 @@ use std::iter::{
 };
 use collections::hashmap::HashMap;
 use euler::factorization;
-
-mod euler;
 
 fn freq_count<A: TotalEq + Hash, T: Iterator<A>>(mut itr: T) -> HashMap<A, uint> {
 	let mut map = HashMap::new();

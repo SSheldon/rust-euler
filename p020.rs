@@ -1,3 +1,4 @@
+extern crate euler;
 extern crate num;
 
 use std::iter::{
@@ -6,8 +7,6 @@ use std::iter::{
 };
 use num::bigint::ToBigUint;
 use euler::Digits;
-
-mod euler;
 
 fn main() {
 	let fac = range(1, 101).map(|x| x.to_biguint().unwrap()).product();

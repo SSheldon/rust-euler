@@ -1,7 +1,7 @@
+extern crate euler;
+
 use std::iter::AdditiveIterator;
 use euler::Digits;
-
-mod euler;
 
 static DIGIT_FACS: [uint, ..10] = [
 	1,
