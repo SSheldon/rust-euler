@@ -1,0 +1,11 @@
+[package]
+name = "euler"
+version = "0.0.0"
+authors = ["Steven Sheldon"]
+
+[lib]
+name = "euler"
+path = "mod.rs"
+
+[dependencies]
+num = "0.0.6"

@@ -1,22 +1,23 @@
 #![allow(dead_code)]
 
-extern crate collections;
 extern crate num;
 
-use std::iter::{AdditiveIterator, range_inclusive, range_step};
-use std::num::{Num, One, sqrt, Zero};
-use self::collections::bitv::{Bitv, BitvSet};
-use self::num::Integer;
+use std::collections::bitv::Bitv;
+use std::collections::bitv_set::BitvSet;
+use std::iter::{range_inclusive, range_step};
+use std::num::Float;
+use self::num::{Integer, Num, One, Zero};
 
 // Factorization
 fn least_divisor(n: uint) -> uint {
-	match range_inclusive(2, sqrt(n as f64) as uint).find(|&x| n % x == 0) {
+	match range_inclusive(2, (n as f64).sqrt() as uint).find(|&x| n % x == 0) {
 		Some(x) => x,
 		None => n,
 	}
 }
 
-struct Factorization {
+#[allow(missing_copy_implementations)]
+pub struct Factorization {
 	remainder: uint,
 }
 
@@ -38,18 +39,18 @@ pub fn factorization(n: uint) -> Factorization {
 
 // Primes
 pub fn is_prime(n: uint) -> bool {
-	range_inclusive(2, sqrt(n as f64) as uint).all(|x| n % x != 0)
+	range_inclusive(2, (n as f64).sqrt() as uint).all(|x| n % x != 0)
 }
 
 pub struct Primes {
-	priv current: uint,
-	priv stop: uint,
-	priv primes: Bitv,
+	current: uint,
+	stop: uint,
+	primes: Bitv,
 }
 
 impl Primes {
 	pub fn new(stop: uint) -> Primes {
-		let mut primes = Bitv::new(stop, true);
+		let mut primes = Bitv::with_capacity(stop, true);
 		primes.set(0, false);
 		primes.set(1, false);
 		Primes{current: 1, stop: stop, primes: primes}
@@ -74,14 +75,15 @@ impl Iterator<uint> for Primes {
 
 pub fn primes(stop: uint) -> BitvSet {
 	let mut itr = Primes::new(stop);
-	itr.advance(|_| true);
+	// Advance the iterator to the end
+	for _ in itr { }
 	BitvSet::from_bitv(itr.primes)
 }
 
 // Fibonacci
 pub struct Fibonacci<T> {
-	priv current : T,
-	priv previous : T,
+	current : T,
+	previous : T,
 }
 
 impl<T: Num> Fibonacci<T> {
@@ -102,14 +104,13 @@ impl<T: Num + Clone> Iterator<T> for Fibonacci<T> {
 
 // Digits
 pub struct Digits<T> {
-	priv remainder: T,
-	priv radix: T,
+	remainder: T,
+	radix: T,
 }
 
-impl<T: Integer> Digits<T> {
+impl<T: Integer + FromPrimitive> Digits<T> {
 	pub fn new(n: T) -> Digits<T> {
-		let one: |int| -> T = |_| { One::one() };
-		let ten: T = range(0, 10).map(one).sum(); // Lol
+		let ten = FromPrimitive::from_u8(10).unwrap();
 		Digits{remainder: n, radix: ten}
 	}
 }
