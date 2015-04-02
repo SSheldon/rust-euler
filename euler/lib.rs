@@ -1,26 +1,28 @@
+#![feature(collections, core)]
+
 extern crate num;
 
-use std::collections::bitv::Bitv;
-use std::collections::bitv_set::BitvSet;
-use std::iter::{range_inclusive, range_step};
-use std::num::Float;
-use self::num::{Integer, Num, One, Zero};
+use std::collections::{BitVec, BitSet};
+use std::mem;
+use std::num::FromPrimitive;
+use num::{Integer, Num, One, Zero, range, range_inclusive, range_step};
 
 // Factorization
-fn least_divisor(n: uint) -> uint {
-	match range_inclusive(2, (n as f64).sqrt() as uint).find(|&x| n % x == 0) {
+fn least_divisor(n: usize) -> usize {
+	match range_inclusive(2, (n as f64).sqrt() as usize).find(|&x| n % x == 0) {
 		Some(x) => x,
 		None => n,
 	}
 }
 
-#[allow(missing_copy_implementations)]
 pub struct Factorization {
-	remainder: uint,
+	remainder: usize,
 }
 
-impl Iterator<uint> for Factorization {
-	fn next(&mut self) -> Option<uint> {
+impl Iterator for Factorization {
+	type Item = usize;
+
+	fn next(&mut self) -> Option<usize> {
 		if self.remainder > 1 {
 			let factor = least_divisor(self.remainder);
 			self.remainder /= factor;
@@ -31,33 +33,36 @@ impl Iterator<uint> for Factorization {
 	}
 }
 
-pub fn factorization(n: uint) -> Factorization {
+pub fn factorization(n: usize) -> Factorization {
 	Factorization{remainder: n}
 }
 
 // Primes
-pub fn is_prime(n: uint) -> bool {
-	range_inclusive(2, (n as f64).sqrt() as uint).all(|x| n % x != 0)
+pub fn is_prime(n: usize) -> bool {
+	range_inclusive(2, (n as f64).sqrt() as usize).all(|x| n % x != 0)
 }
 
 pub struct Primes {
-	current: uint,
-	stop: uint,
-	primes: Bitv,
+	current: usize,
+	stop: usize,
+	primes: BitVec,
 }
 
 impl Primes {
-	pub fn new(stop: uint) -> Primes {
-		let mut primes = Bitv::with_capacity(stop, true);
+	pub fn new(stop: usize) -> Primes {
+		let mut primes = BitVec::with_capacity(stop);
+		primes.set_all();
 		primes.set(0, false);
 		primes.set(1, false);
 		Primes{current: 1, stop: stop, primes: primes}
 	}
 }
 
-impl Iterator<uint> for Primes {
-	fn next(&mut self) -> Option<uint> {
-		match range(self.current + 1, self.stop).find(|&x| self.primes.get(x)) {
+impl Iterator for Primes {
+	type Item = usize;
+
+	fn next(&mut self) -> Option<usize> {
+		match range(self.current + 1, self.stop).find(|&x| self.primes[x]) {
 			None => None,
 			Some(x) => {
 				// Mark all multiples of x as not prime
@@ -71,11 +76,11 @@ impl Iterator<uint> for Primes {
 	}
 }
 
-pub fn primes(stop: uint) -> BitvSet {
+pub fn primes(stop: usize) -> BitSet {
 	let mut itr = Primes::new(stop);
 	// Advance the iterator to the end
-	for _ in itr { }
-	BitvSet::from_bitv(itr.primes)
+	for _ in &mut itr { }
+	BitSet::from_bit_vec(itr.primes)
 }
 
 // Fibonacci
@@ -90,11 +95,13 @@ impl<T: Num> Fibonacci<T> {
 	}
 }
 
-impl<T: Num + Clone> Iterator<T> for Fibonacci<T> {
+impl<T: Num + Clone> Iterator for Fibonacci<T> {
+	type Item = T;
+
 	fn next(&mut self) -> Option<T> {
-		let curr = self.current.clone();
-		let next = curr + self.previous;
-		self.previous = curr;
+		let prev = mem::replace(&mut self.previous, self.current.clone());
+		let curr = mem::replace(&mut self.current, Zero::zero());
+		let next = prev + curr;
 		self.current = next.clone();
 		Some(next)
 	}
@@ -113,7 +120,9 @@ impl<T: Integer + FromPrimitive> Digits<T> {
 	}
 }
 
-impl<T: Integer> Iterator<T> for Digits<T> {
+impl<T: Integer> Iterator for Digits<T> {
+	type Item = T;
+
 	fn next(&mut self) -> Option<T> {
 		if !self.remainder.is_zero() {
 			let (rem, digit) = self.remainder.div_rem(&self.radix);

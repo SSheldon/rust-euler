@@ -8,4 +8,4 @@ name = "euler"
 path = "lib.rs"
 
 [dependencies]
-num = "0.0.6"
+num = "0.1"
