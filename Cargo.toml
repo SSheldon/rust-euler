@@ -3,9 +3,5 @@ name = "euler"
 version = "0.0.0"
 authors = ["Steven Sheldon"]
 
-[lib]
-name = "euler"
-path = "lib.rs"
-
 [dependencies]
 num = "0.1"
