@@ -1,11 +1,10 @@
-#![feature(collections, core)]
+#![feature(collections)]
 
 extern crate num;
 
 use std::collections::{BitVec, BitSet};
 use std::mem;
-use std::num::FromPrimitive;
-use num::{Integer, Num, One, Zero, range, range_inclusive, range_step};
+use num::{FromPrimitive, Integer, Num, One, Zero, range, range_inclusive, range_step};
 
 // Factorization
 fn least_divisor(n: usize) -> usize {
