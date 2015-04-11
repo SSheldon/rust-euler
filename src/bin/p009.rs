@@ -19,7 +19,7 @@ such that b is also a natural number
 */
 fn main() {
 	let s = 1000;
-	let a = range(1, s).find(|&x| (s*(s-2*x)) % (2*(s-x)) == 0).unwrap();
+	let a = (1..s).find(|&x| (s*(s-2*x)) % (2*(s-x)) == 0).unwrap();
 	let b = (s*(s-2*a)) / (2*(s-a));
 	let c = s - a - b;
 	println!("{}", a * b * c);

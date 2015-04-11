@@ -58,8 +58,7 @@ pub struct Primes {
 
 impl Primes {
 	pub fn new(stop: usize) -> Primes {
-		let mut primes = BitVec::with_capacity(stop);
-		primes.set_all();
+		let mut primes = BitVec::from_elem(stop, true);
 		primes.set(0, false);
 		primes.set(1, false);
 		Primes{current: 1, stop: stop, primes: primes}
