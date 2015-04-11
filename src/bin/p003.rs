@@ -1,6 +1,5 @@
 extern crate euler;
 
-use std::iter::OrdIterator;
 use euler::factorization;
 
 fn main() {

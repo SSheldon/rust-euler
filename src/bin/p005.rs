@@ -1,46 +1,50 @@
-extern crate collections;
+#![feature(core)]
+
 extern crate euler;
+extern crate num;
 
+use std::collections::hash_map::{HashMap, Entry};
 use std::hash::Hash;
-use std::iter::{
-	range_inclusive,
-	MultiplicativeIterator,
-};
-use std::num::pow;
-use collections::hashmap::HashMap;
 use euler::factorization;
+use num::{pow, range_inclusive};
 
-fn freq_count<A: TotalEq + Hash, T: Iterator<A>>(mut itr: T) -> HashMap<A, uint> {
+fn freq_count<A, T>(itr: T) -> HashMap<A, usize>
+		where A: Eq + Hash, T: Iterator<Item=A> {
 	let mut map = HashMap::new();
 	for item in itr {
-		map.insert_or_update_with(item, 1, |_, count| *count += 1);
+		*map.entry(item).or_insert(0) += 1;
 	}
 	map
 }
 
-fn max_values<K: TotalEq + Hash + Clone, V: Ord + Clone, T: Iterator<HashMap<K, V>>>(mut itr: T) -> HashMap<K, V> {
+fn max_values<K, V, T>(itr: T) -> HashMap<K, V>
+		where K: Eq + Hash, V: Ord, T: Iterator<Item=HashMap<K, V>> {
 	let mut max: HashMap<K, V> = HashMap::new();
 	for map in itr {
-		for (key, value) in map.iter() {
-			if max.contains_key(key) {
-				let existing = max.get_mut(key);
-				if existing.lt(value) {
-					*existing = value.clone();
-				}
-			} else {
-				max.insert(key.clone(), value.clone());
+		for (key, value) in map {
+			match max.entry(key) {
+				Entry::Occupied(mut entry) => {
+					let existing = entry.get_mut();
+					if *existing < value {
+						*existing = value;
+					}
+				},
+				Entry::Vacant(entry) => {
+					entry.insert(value);
+				},
 			}
 		}
 	}
 	max
 }
 
-fn lcm<T: Iterator<uint>>(itr: T) -> uint {
-	let factors = max_values(itr.map(|x| freq_count(factorization(x))));
-	factors.iter().map(|(&k, &v)| pow(k, v)).product()
+fn lcm<T>(itr: T) -> usize where T: Iterator<Item=usize> {
+	let freqs = itr.map(factorization).map(freq_count);
+	let factors = max_values(freqs);
+	factors.into_iter().map(|(k, v)| pow(k, v)).product()
 }
 
 fn main() {
-	let min = lcm(range_inclusive(1u, 20u));
+	let min = lcm(range_inclusive(1, 20));
 	println!("{}", min);
 }
