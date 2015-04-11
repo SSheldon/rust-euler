@@ -38,7 +38,7 @@ fn max_values<K, V, T>(itr: T) -> HashMap<K, V>
 	max
 }
 
-fn lcm<T>(itr: T) -> usize where T: Iterator<Item=usize> {
+fn lcm<T>(itr: T) -> u32 where T: Iterator<Item=u32> {
 	let freqs = itr.map(factorization).map(freq_count);
 	let factors = max_values(freqs);
 	factors.into_iter().map(|(k, v)| pow(k, v)).product()

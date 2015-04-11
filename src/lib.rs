@@ -4,27 +4,35 @@ extern crate num;
 
 use std::collections::{BitVec, BitSet};
 use std::mem;
-use num::{FromPrimitive, Integer, Num, One, Zero, range, range_inclusive, range_step};
+use num::{
+	FromPrimitive, ToPrimitive, Integer, Num, One, Zero,
+	range, range_inclusive, range_step,
+};
 
 // Factorization
-fn least_divisor(n: usize) -> usize {
-	match range_inclusive(2, (n as f64).sqrt() as usize).find(|&x| n % x == 0) {
+fn least_divisor<T>(n: T) -> T
+		where T: Integer + FromPrimitive + ToPrimitive + Clone {
+	let two = T::one() + T::one();
+	let max = T::from_f64(n.to_f64().unwrap().sqrt()).unwrap();
+	match range_inclusive(two, max).find(|x| n.is_multiple_of(x)) {
 		Some(x) => x,
 		None => n,
 	}
 }
 
-pub struct Factorization {
-	remainder: usize,
+pub struct Factorization<T> {
+	remainder: T,
 }
 
-impl Iterator for Factorization {
-	type Item = usize;
+impl<T> Iterator for Factorization<T>
+		where T: Integer + FromPrimitive + ToPrimitive + Clone {
+	type Item = T;
 
-	fn next(&mut self) -> Option<usize> {
-		if self.remainder > 1 {
-			let factor = least_divisor(self.remainder);
-			self.remainder /= factor;
+	fn next(&mut self) -> Option<T> {
+		if self.remainder > T::one() {
+			let factor = least_divisor(self.remainder.clone());
+			let remainder = mem::replace(&mut self.remainder, T::one());
+			self.remainder = remainder / factor.clone();
 			Some(factor)
 		} else {
 			None
@@ -32,7 +40,8 @@ impl Iterator for Factorization {
 	}
 }
 
-pub fn factorization(n: usize) -> Factorization {
+pub fn factorization<T>(n: T) -> Factorization<T>
+		where T: Integer + FromPrimitive + ToPrimitive + Clone {
 	Factorization{remainder: n}
 }
 
