@@ -4,4 +4,6 @@ version = "0.0.0"
 authors = ["Steven Sheldon"]
 
 [dependencies]
+bit-vec = "0.2"
+bit-set = "0.2"
 num = "0.1"

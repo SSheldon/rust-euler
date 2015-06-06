@@ -1,9 +1,10 @@
-#![feature(collections)]
-
+extern crate bit_vec;
+extern crate bit_set;
 extern crate num;
 
-use std::collections::{BitVec, BitSet};
 use std::mem;
+use bit_vec::BitVec;
+use bit_set::BitSet;
 use num::{
 	FromPrimitive, ToPrimitive, Integer, Num, One, Zero,
 	range, range_inclusive, range_step,
