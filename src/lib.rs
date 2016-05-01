@@ -1,6 +1,7 @@
 extern crate bit_vec;
 extern crate bit_set;
 extern crate num;
+extern crate vec_map;
 
 use std::mem;
 use bit_vec::BitVec;

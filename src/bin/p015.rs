@@ -1,46 +1,12 @@
+extern crate vec_map;
+
 use std::cell::RefCell;
-
-struct VecMap<K, V> {
-	index: Box<Fn(&K) -> usize>,
-	vec: Vec<Option<V>>,
-}
-
-impl<K, V> VecMap<K, V> {
-	fn new<F>(index: F) -> VecMap<K, V>
-			where F: 'static + Fn(&K) -> usize {
-		VecMap {
-			index: Box::new(index),
-			vec: Vec::new(),
-		}
-	}
-
-	fn find<'r>(&'r self, key: &K) -> Option<&'r V> {
-		let index = (self.index)(key);
-		if index < self.vec.len() {
-			self.vec[index].as_ref()
-		} else {
-			None
-		}
-	}
-
-	fn insert(&mut self, key: K, val: V) {
-		let index = (self.index)(&key);
-		let len = self.vec.len();
-		// It'd be nice to use grow_set here, but it requires V: Clone
-		if index >= len {
-			let new_len = index + 1;
-			self.vec.reserve(new_len);
-			for _ in len..new_len {
-				self.vec.push(None);
-			}
-		}
-		self.vec[index] = Some(val);
-	}
-}
+use vec_map::VecMap;
 
 struct Memoization<A, B> {
 	calc: Box<Fn(A, &Memoization<A, B>) -> B>,
-	cache: RefCell<VecMap<A, B>>,
+	index: Box<Fn(&A) -> usize>,
+	cache: RefCell<VecMap<B>>,
 }
 
 impl<A: Clone, B: Clone> Memoization<A, B> {
@@ -49,17 +15,19 @@ impl<A: Clone, B: Clone> Memoization<A, B> {
 			      C: 'static + Fn(A, &Self) -> B {
 		Memoization{
 			calc: Box::new(calc),
-			cache: RefCell::new(VecMap::new(index)),
+			index: Box::new(index),
+			cache: RefCell::new(VecMap::new()),
 		}
 	}
 
 	fn get(&self, arg: A) -> B {
-		if let Some(cached) = self.cache.borrow().find(&arg) {
+		let index = (self.index)(&arg);
+		if let Some(cached) = self.cache.borrow().get(index) {
 			return cached.clone();
 		}
 
 		let result = (self.calc)(arg.clone(), self);
-		self.cache.borrow_mut().insert(arg, result.clone());
+		self.cache.borrow_mut().insert(index, result.clone());
 		result
 	}
 }

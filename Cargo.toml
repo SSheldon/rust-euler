@@ -7,3 +7,4 @@ authors = ["Steven Sheldon"]
 bit-vec = "0.4"
 bit-set = "0.4"
 num = "0.1"
+vec_map = "0.6"
