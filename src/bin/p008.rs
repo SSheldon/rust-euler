@@ -1,4 +1,4 @@
-#![feature(core)]
+#![feature(iter_arith)]
 
 static DIGITS: [u32; 1000] = [
 	7,3,1,6,7,1,7,6,5,3,1,3,3,0,6,2,4,9,1,9,2,2,5,1,1,

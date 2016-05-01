@@ -1,4 +1,4 @@
-#![feature(core)]
+#![feature(iter_arith)]
 
 fn main() {
 	let sum: u32 = (1..101).sum();
