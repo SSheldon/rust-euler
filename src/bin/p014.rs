@@ -1,4 +1,4 @@
-fn collatz_len(n: uint) -> uint {
+fn collatz_len(n: u64) -> u32 {
 	match n {
 		1 => 1,
 		n if n % 2 == 0 => 1 + collatz_len(n / 2),
@@ -7,6 +7,6 @@ fn collatz_len(n: uint) -> uint {
 }
 
 fn main() {
-	let longest = range(1u, 1000000u).max_by(|&x| collatz_len(x)).unwrap();
+	let longest = (1..1000000).max_by_key(|&x| collatz_len(x)).unwrap();
 	println!("{}", longest);
 }

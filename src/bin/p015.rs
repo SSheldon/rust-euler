@@ -1,102 +1,69 @@
-struct VecMap<'a, K, V> {
-	index: 'a |&K| -> uint,
+struct VecMap<K, V> {
+	index: Box<Fn(&K) -> usize>,
 	vec: Vec<Option<V>>,
 }
 
-impl<'a, K, V> Container for VecMap<'a, K, V> {
-	fn len(&self) -> uint {
-		self.vec.iter().count(|x| x.is_some())
+impl<K, V> VecMap<K, V> {
+	fn new<F>(index: F) -> VecMap<K, V>
+			where F: 'static + Fn(&K) -> usize {
+		VecMap {
+			index: Box::new(index),
+			vec: Vec::new(),
+		}
 	}
-}
 
-impl<'a, K, V> Map<K, V> for VecMap<'a, K, V> {
 	fn find<'r>(&'r self, key: &K) -> Option<&'r V> {
 		let index = (self.index)(key);
 		if index < self.vec.len() {
-			self.vec.get(index).as_ref()
+			self.vec[index].as_ref()
 		} else {
 			None
 		}
 	}
-}
 
-impl<'a, K, V> Mutable for VecMap<'a, K, V> {
-	fn clear(&mut self) {
-		self.vec.clear();
-	}
-}
-
-impl<'a, K, V> MutableMap<K, V> for VecMap<'a, K, V> {
-	fn swap(&mut self, key: K, val: V) -> Option<V> {
+	fn insert(&mut self, key: K, val: V) {
 		let index = (self.index)(&key);
 		let len = self.vec.len();
-		let old = if index < len {
-			self.vec.get_mut(index).take()
-		} else {
-			None
-		};
 		// It'd be nice to use grow_set here, but it requires V: Clone
 		if index >= len {
 			let new_len = index + 1;
 			self.vec.reserve(new_len);
-			for _ in range(len, new_len) {
+			for _ in len..new_len {
 				self.vec.push(None);
 			}
 		}
-		*self.vec.get_mut(index) = Some(val);
-		old
-	}
-
-	fn pop(&mut self, key: &K) -> Option<V> {
-		let index = (self.index)(key);
-		if index < self.vec.len() {
-			self.vec.get_mut(index).take()
-		} else {
-			None
-		}
-	}
-
-	fn find_mut<'r>(&'r mut self, key: &K) -> Option<&'r mut V> {
-		let index = (self.index)(key);
-		if index < self.vec.len() {
-			self.vec.get_mut(index).as_mut()
-		} else {
-			None
-		}
+		self.vec[index] = Some(val);
 	}
 }
 
-struct Memoization<'a, A, B, T> {
-	calc: 'a |A, |A| -> B| -> B,
-	cache: T,
+struct Memoization<A, B> {
+	calc: fn(A, &mut FnMut(A) -> B) -> B,
+	cache: VecMap<A, B>,
 }
 
-impl<'a, A: Clone, B: Clone, T: MutableMap<A, B>> Memoization<'a, A, B, T> {
+impl<A: Clone, B: Clone> Memoization<A, B> {
 	fn get(&mut self, arg: A) -> B {
-		if self.cache.contains_key(&arg) {
-			let cached = self.cache.find(&arg).unwrap();
-			cached.clone()
-		} else {
-			let result = (self.calc)(arg.clone(), |x| self.get(x));
-			self.cache.insert(arg, result.clone());
-			result
+		if let Some(cached) = self.cache.find(&arg) {
+			return cached.clone();
 		}
+
+		let result = (self.calc)(arg.clone(), &mut |x| self.get(x));
+		self.cache.insert(arg, result.clone());
+		result
 	}
 }
 
-fn memoize<'r, A, B>(index: 'r |&A| -> uint, calc: 'r |A, |A| -> B| -> B) -> Memoization<'r, A, B, VecMap<'r, A, B>> {
+fn memoize<A, B, F>(index: F, calc: fn(A, &mut FnMut(A) -> B) -> B) -> Memoization<A, B>
+		where F: 'static + Fn(&A) -> usize {
 	Memoization{
 		calc: calc,
-		cache: VecMap{
-			index: index,
-			vec: Vec::new(),
-		},
+		cache: VecMap::new(index),
 	}
 }
 
-static SIZE: uint = 21;
+const SIZE: u32 = 21;
 
-fn num_routes((w, h): (uint, uint), f: |(uint, uint)| -> uint) -> uint {
+fn num_routes((w, h): (u32, u32), f: &mut FnMut((u32, u32)) -> u64) -> u64 {
 	if w == 0 || h == 0 {
 		1
 	} else {
@@ -107,8 +74,8 @@ fn num_routes((w, h): (uint, uint), f: |(uint, uint)| -> uint) -> uint {
 }
 
 fn main() {
-	let mut mem = memoize::<(uint, uint), uint>(
-		|&(w, h)| SIZE * h + w,
+	let mut mem = memoize(
+		|&(w, h)| (SIZE * h + w) as usize,
 		num_routes,
 	);
 	println!("{}", mem.get((20, 20)));
