@@ -1,3 +1,5 @@
+use std::cell::RefCell;
+
 struct VecMap<K, V> {
 	index: Box<Fn(&K) -> usize>,
 	vec: Vec<Option<V>>,
@@ -37,44 +39,45 @@ impl<K, V> VecMap<K, V> {
 }
 
 struct Memoization<A, B> {
-	calc: fn(A, &mut FnMut(A) -> B) -> B,
-	cache: VecMap<A, B>,
+	calc: Box<Fn(A, &Memoization<A, B>) -> B>,
+	cache: RefCell<VecMap<A, B>>,
 }
 
 impl<A: Clone, B: Clone> Memoization<A, B> {
-	fn get(&mut self, arg: A) -> B {
-		if let Some(cached) = self.cache.find(&arg) {
+	fn new<I, C>(index: I, calc: C) -> Self
+			where I: 'static + Fn(&A) -> usize,
+			      C: 'static + Fn(A, &Self) -> B {
+		Memoization{
+			calc: Box::new(calc),
+			cache: RefCell::new(VecMap::new(index)),
+		}
+	}
+
+	fn get(&self, arg: A) -> B {
+		if let Some(cached) = self.cache.borrow().find(&arg) {
 			return cached.clone();
 		}
 
-		let result = (self.calc)(arg.clone(), &mut |x| self.get(x));
-		self.cache.insert(arg, result.clone());
+		let result = (self.calc)(arg.clone(), self);
+		self.cache.borrow_mut().insert(arg, result.clone());
 		result
-	}
-}
-
-fn memoize<A, B, F>(index: F, calc: fn(A, &mut FnMut(A) -> B) -> B) -> Memoization<A, B>
-		where F: 'static + Fn(&A) -> usize {
-	Memoization{
-		calc: calc,
-		cache: VecMap::new(index),
 	}
 }
 
 const SIZE: u32 = 21;
 
-fn num_routes((w, h): (u32, u32), f: &mut FnMut((u32, u32)) -> u64) -> u64 {
+fn num_routes((w, h): (u32, u32), f: &Memoization<(u32, u32), u64>) -> u64 {
 	if w == 0 || h == 0 {
 		1
 	} else {
-		let right = f((w - 1, h));
-		let down  = f((w, h - 1));
+		let right = f.get((w - 1, h));
+		let down  = f.get((w, h - 1));
 		right + down
 	}
 }
 
 fn main() {
-	let mut mem = memoize(
+	let mem = Memoization::new(
 		|&(w, h)| (SIZE * h + w) as usize,
 		num_routes,
 	);
