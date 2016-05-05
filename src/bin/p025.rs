@@ -1,13 +1,13 @@
 extern crate euler;
 extern crate num;
 
-use std::num::pow;
-use num::bigint::{BigUint, ToBigUint};
+use num::pow;
+use num::bigint::BigUint;
 use euler::Fibonacci;
 
 fn main() {
 	let mut fib = Fibonacci::<BigUint>::new();
-	let threshhold = pow(10u.to_biguint().unwrap(), 999);
+	let threshhold = pow(BigUint::from(10u32), 999);
 	let first = fib.position(|x| x >= threshhold).unwrap();
 	println!("{}", first + 1);
 }

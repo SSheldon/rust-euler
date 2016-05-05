@@ -1,32 +1,32 @@
-extern crate collections;
+#![feature(iter_arith)]
+
 extern crate euler;
 
-use std::iter::AdditiveIterator;
-use collections::hashmap::HashSet;
+use std::collections::HashSet;
 use euler::factorization;
 
-fn divisors(n: uint) -> HashSet<uint> {
+fn divisors(n: u32) -> HashSet<u32> {
 	let mut divisors = HashSet::new();
-	divisors.insert(1u);
+	divisors.insert(1);
 	for factor in factorization(n) {
-		let new_divisors: Vec<uint> = divisors.iter().map(|&x| x * factor).collect();
-		divisors.extend(new_divisors.move_iter());
+		let new_divisors: Vec<u32> = divisors.iter().map(|&x| x * factor).collect();
+		divisors.extend(new_divisors);
 	}
 	divisors
 }
 
-fn proper_divisors(n: uint) -> HashSet<uint> {
+fn proper_divisors(n: u32) -> HashSet<u32> {
 	let mut proper_divisors = divisors(n);
 	proper_divisors.remove(&n);
 	proper_divisors
 }
 
-fn is_amicable(n: uint) -> bool {
-	let other = proper_divisors(n).move_iter().sum();
-	other != n && n == proper_divisors(other).move_iter().sum()
+fn is_amicable(n: u32) -> bool {
+	let other = proper_divisors(n).into_iter().sum();
+	other != n && n == proper_divisors(other).into_iter().sum()
 }
 
 fn main() {
-	let amicable_sum = range(2u, 10000u).filter(|&x| is_amicable(x)).sum();
+	let amicable_sum: u32 = (2..10000).filter(|&x| is_amicable(x)).sum();
 	println!("{}", amicable_sum);
 }

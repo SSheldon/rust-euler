@@ -1,15 +1,16 @@
-use std::iter::{
-	MultiplicativeIterator,
-	range_inclusive,
-};
+#![feature(iter_arith)]
 
-fn lex_permutation(num_digits: uint, mut index: uint) -> ~str {
-	let mut digits: Vec<uint> = range(0, num_digits).collect();
-	let mut d = range_inclusive(1, num_digits).product();
-	let mut result = ~"";
+extern crate num;
+
+use num::range_inclusive;
+
+fn lex_permutation(num_digits: u32, mut index: u32) -> String {
+	let mut digits: Vec<u32> = (0..num_digits).collect();
+	let mut d: u32 = range_inclusive(1, num_digits).product();
+	let mut result = String::new();
 	for i in range_inclusive(1, num_digits).rev() {
 		d /= i;
-		result.push_str(digits.remove(index / d).unwrap().to_str());
+		result.push_str(&digits.remove((index / d) as usize).to_string());
 		index %= d;
 	}
 	result
