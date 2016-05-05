@@ -1,7 +1,8 @@
 use std::cmp::max;
-use std::io::File;
+use std::fs::File;
+use std::io::Read;
 
-fn collapse_rows<T: Iterator<Vec<uint>>>(mut rows: T) -> uint {
+fn collapse_rows<T: Iterator<Item=Vec<u32>>>(mut rows: T) -> u32 {
 	let mut collapsed = match rows.next() {
 		Some(row) => row,
 		None => { return 0; }
@@ -14,17 +15,17 @@ fn collapse_rows<T: Iterator<Vec<uint>>>(mut rows: T) -> uint {
 		collapsed = maxs.zip(row.iter()).map(|(x, &y)| x + y).collect();
 	}
 	// After the last row we've collapsed to a single element
-	*collapsed.get(0)
+	collapsed[0]
 }
 
-fn nums_from_line(line: &str) -> Vec<uint> {
-	line.split(' ').map(|x| from_str(x).unwrap()).collect()
+fn nums_from_line(line: &str) -> Vec<u32> {
+	line.split(' ').map(|x| x.parse().unwrap()).collect()
 }
 
 fn main() {
-	let p = Path::new("p018-triangle.txt");
-	let mut file = File::open(&p).unwrap();
-	let contents = file.read_to_str().unwrap();
+	let mut file = File::open("p018-triangle.txt").unwrap();
+	let mut contents = String::new();
+	file.read_to_string(&mut contents).unwrap();
 
 	let rows = contents.split('\n').map(nums_from_line);
 	let max_path_sum = collapse_rows(rows);

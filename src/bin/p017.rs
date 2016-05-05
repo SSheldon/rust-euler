@@ -1,6 +1,6 @@
-use std::iter::AdditiveIterator;
+#![feature(iter_arith)]
 
-fn written_len(n: uint) -> uint {
+fn written_len(n: u32) -> usize {
 	match n {
 		0 => 0,
 		1 => "one".len(),
@@ -42,5 +42,6 @@ fn written_len(n: uint) -> uint {
 }
 
 fn main() {
-	println!("{}", range(1u, 1001u).map(written_len).sum());
+	let sum: usize = (1..1001).map(written_len).sum();
+	println!("{}", sum);
 }
