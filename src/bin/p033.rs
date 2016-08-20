@@ -1,9 +1,10 @@
 extern crate num;
 
-use std::iter::{MultiplicativeIterator, Repeat};
+use std::iter::repeat;
+use num::One;
 use num::rational::Ratio;
 
-fn digits_cancel(numer: uint, denom: uint) -> bool {
+fn digits_cancel(numer: u32, denom: u32) -> bool {
 	let (n1, n0) = (numer / 10, numer % 10);
 	let (d1, d0) = (denom / 10, denom % 10);
 	(n1 == d1 && n1 != 0 && numer * d0 == n0 * denom) ||
@@ -13,10 +14,11 @@ fn digits_cancel(numer: uint, denom: uint) -> bool {
 }
 
 fn main() {
-	let product = range(10u, 100u)
-		.flat_map(|n| Repeat::new(n).zip(range(n + 1, 100u)))
+	let product = (10..100)
+		.flat_map(|n| repeat(n).zip(n+1..100))
 		.filter(|&(n, d)| digits_cancel(n, d))
 		.map(|(n, d)| Ratio::new(n, d))
-		.product().reduced();
+		.fold(Ratio::one(), |a, b| a * b)
+		.reduced();
 	println!("{}", product.denom());
 }
