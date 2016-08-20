@@ -1,18 +1,14 @@
 .PHONY: all clean-all time-all
 
-PROBLEMS := $(patsubst %.rs,%,$(wildcard p*.rs))
+PROBLEMS := $(patsubst src/bin/%.rs,%,$(wildcard src/bin/p*.rs))
 
-all: $(PROBLEMS)
-
-p%: p%.rs euler/lib.rs
-	# TODO: this is a hack where the euler crate must be made already
-	# and all dependencies from the problems must be in its dependencies
-	rustc -O -L euler/target -L euler/target/deps $<
+all:
+	cargo build --release
 
 time-all: $(addprefix time-,$(PROBLEMS))
 
-time-p%: p%
-	@time ./$<
+time-p%: all
+	@time target/release/p$*
 
 clean-all:
-	rm -f $(PROBLEMS)
+	cargo clean
