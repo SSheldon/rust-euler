@@ -1,9 +1,8 @@
 extern crate euler;
 
-use std::iter::AdditiveIterator;
 use euler::Digits;
 
-static DIGIT_POWS: [uint, ..10] = [
+static DIGIT_POWS: [u32; 10] = [
 	0,
 	1,
 	2*2*2*2*2,
@@ -16,12 +15,12 @@ static DIGIT_POWS: [uint, ..10] = [
 	9*9*9*9*9,
 ];
 
-fn digit_power_sum(n: uint) -> uint {
-	Digits::new(n).map(|x| DIGIT_POWS[x]).sum()
+fn digit_power_sum(n: u32) -> u32 {
+	Digits::new(n).map(|x| DIGIT_POWS[x as usize]).sum()
 }
 
 fn main() {
 	// Upper bound chosen empirically
-	let sum = range(2u, 200000u).filter(|&x| x == digit_power_sum(x)).sum();
+	let sum: u32 = (2..200000).filter(|&x| x == digit_power_sum(x)).sum();
 	println!("{}", sum);
 }

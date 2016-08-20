@@ -1,4 +1,4 @@
-fn recurring_cycle_len(d: uint) -> uint {
+fn recurring_cycle_len(d: u32) -> usize {
 	let mut rem = 1;
 	let mut prev_rems = Vec::new();
 	while rem > 0 {
@@ -14,6 +14,6 @@ fn recurring_cycle_len(d: uint) -> uint {
 }
 
 fn main() {
-	let max_d = range(2u, 1000u).max_by(|&d| recurring_cycle_len(d)).unwrap();
+	let max_d = (2..1000).max_by_key(|&d| recurring_cycle_len(d)).unwrap();
 	println!("{}", max_d);
 }
