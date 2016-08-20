@@ -3,6 +3,10 @@ extern crate bit_set;
 extern crate num;
 extern crate vec_map;
 
+mod permute;
+
+pub use permute::permute;
+
 use std::mem;
 use bit_vec::BitVec;
 use bit_set::BitSet;

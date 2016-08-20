@@ -1,21 +1,21 @@
-extern crate collections;
+extern crate euler;
 
-use std::iter::AdditiveIterator;
-use collections::hashmap::HashSet;
+use std::collections::HashSet;
+use euler::permute;
 
-fn from_digits(digits: &[uint]) -> uint {
+fn from_digits(digits: &[u32]) -> u32 {
 	digits.iter().fold(0, |n, &d| n * 10 + d)
 }
 
-fn pandigital_product(perm: &[uint]) -> Option<uint> {
+fn pandigital_product(perm: &[u32]) -> Option<u32> {
 	// Since we have 9 digits total, product must be 4 digits long:
 	// 4 digits for the multiplication cannot result in a 5 digit product,
 	// 6 digits for the multiplication cannot result in a 3 digit product, etc
 	let product_start = perm.len() - 4;
-	let product = from_digits(perm.slice_from(product_start));
-	for multiplier_start in range(1, product_start) {
-		let multiplicand = from_digits(perm.slice_to(multiplier_start));
-		let multiplier = from_digits(perm.slice(multiplier_start, product_start));
+	let product = from_digits(&perm[product_start..]);
+	for multiplier_start in 1..product_start {
+		let multiplicand = from_digits(&perm[..multiplier_start]);
+		let multiplier = from_digits(&perm[multiplier_start..product_start]);
 		if multiplicand * multiplier == product {
 			return Some(product)
 		}
@@ -24,11 +24,15 @@ fn pandigital_product(perm: &[uint]) -> Option<uint> {
 }
 
 fn main() {
-	let digits: Vec<uint> = range(1u, 10u).collect();
+	let mut digits = [1, 2, 3, 4, 5, 6, 7, 8, 9];
+	let mut products = HashSet::new();
 	// Represent equations as a permutation of the digits 1-9
-	let products: HashSet<uint> = digits.as_slice().permutations()
-		.filter_map(|perm| pandigital_product(perm))
-		.collect();
-	let sum = products.move_iter().sum();
+	permute(&mut digits, |perm| {
+		if let Some(product) = pandigital_product(perm) {
+			products.insert(product);
+		}
+	});
+
+	let sum: u32 = products.into_iter().sum();
 	println!("{}", sum);
 }
