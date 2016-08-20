@@ -41,11 +41,9 @@ static DIGITS: [u32; 1000] = [
 	3,6,0,0,8,2,3,2,5,7,5,3,0,4,2,0,7,5,2,9,6,3,4,5,0,
 ];
 
-fn sequence_product(start: usize) -> u32 {
-	DIGITS[start..start + 5].iter().cloned().product()
-}
-
 fn main() {
-	let product = (0..996).map(sequence_product).max().unwrap();
+	let product: u32 = DIGITS.windows(5)
+		.map(|w| w.iter().product())
+		.max().unwrap();
 	println!("{}", product);
 }
