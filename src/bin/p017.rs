@@ -1,5 +1,3 @@
-#![feature(iter_arith)]
-
 fn written_len(n: u32) -> usize {
 	match n {
 		0 => 0,

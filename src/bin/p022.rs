@@ -1,5 +1,3 @@
-#![feature(iter_arith)]
-
 use std::fs::File;
 use std::io::Read;
 

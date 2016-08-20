@@ -1,5 +1,3 @@
-#![feature(iter_arith)]
-
 extern crate euler;
 extern crate num;
 

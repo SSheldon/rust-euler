@@ -1,5 +1,3 @@
-#![feature(iter_arith)]
-
 extern crate num;
 
 use num::range_inclusive;
